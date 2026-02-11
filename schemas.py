@@ -30,3 +30,10 @@ class ProjectResponse(ProjectBase):
     places : list[PlaceResponse]
     
 
+class ProjectUpdate(BaseModel):
+    is_completed: bool
+
+class PlaceUpdate(BaseModel):
+    is_visited: bool
+    
+
