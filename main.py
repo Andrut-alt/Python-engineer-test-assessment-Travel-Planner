@@ -1,8 +1,14 @@
 from fastapi import FastAPI
+
+
 from sqlalchemy import Column, Integer, String, create_engine, ForeignKey, Boolean
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.types import Date
+
+from sqlalchemy.orm import sessionmaker, relationship
+
+import httpx
+
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
 engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
@@ -27,3 +33,19 @@ class ProjectPlaces(Base):
     external_id = Column(Integer, nullable=False)
     note = Column(String, nullable=True)
     is_visited = Column(Boolean, default=False)
+    
+
+async def place_validator(external_id:int):
+    try:
+        async with httpx.AsyncClient() as client:
+            r = await client.get(f'https://api.artic.edu/api/v1/artworks/{external_id}')
+        if  r.status_code == httpx.codes.ok:
+            print('T')
+            return True
+        elif r.status_code ==404:
+            print('F')
+            return False
+    except Exception as e:  
+            print(f"error {e}")
+            return False
+    return False
